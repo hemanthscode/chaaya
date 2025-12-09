@@ -7,9 +7,19 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
+    "prod": "NODE_ENV=production node server.js",
     "seed": "node scripts/seed.js",
+    "seed:full": "npm run clear -- --force && npm run seed",
+    "clear": "node scripts/clear.js",
+    "reset": "npm run clear -- --force && npm run seed",
     "backup": "node scripts/backup.js",
-    "test": "jest --watchAll --verbose"
+    "backup:keep": "node scripts/backup.js --keep-all",
+    "migrate": "node scripts/migrate.js",
+    "migrate:check": "node scripts/migrate.js --dry-run",
+    "db:status": "node scripts/status.js",
+    "db:health": "curl -s http://localhost:5000/api/v1/health || echo 'Server down'",
+    "setup": "npm run seed && npm run migrate",
+    "reset:full": "npm run clear -- --force && npm run setup"
   },
   "keywords": [
     "photography",

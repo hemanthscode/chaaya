@@ -1,8 +1,3 @@
-/**
- * Express Application Setup
- * Main Express application configuration
- */
-
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -14,93 +9,56 @@ import routes from './routes/index.js';
 import { config } from './config/env.js';
 import logger from './utils/logger.js';
 
-// Initialize Express app
 const app = express();
 
-/**
- * Security Middleware
- */
+// Security
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"]
     }
   }
 }));
 
-/**
- * CORS
- */
+// CORS
 app.use(corsMiddleware);
 
-/**
- * Body Parser Middleware
- */
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-/**
- * Compression Middleware
- */
+// Compression
 app.use(compression());
 
-/**
- * Logging Middleware
- */
-if (config.nodeEnv === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message) => logger.info(message.trim())
-    }
-  }));
-}
+// Logging
+app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
 
-/**
- * Trust proxy (for rate limiting behind reverse proxy)
- */
+// Trust proxy
 app.set('trust proxy', 1);
 
-/**
- * Rate Limiting
- */
+// Rate limiting
 app.use('/api/', apiLimiter);
 
-/**
- * API Routes
- */
+// Routes
 app.use('/api/v1', routes);
 
-/**
- * Root route
- */
+// Root
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Chaya Photography Portfolio API',
-    version: '1.0.0',
-    status: 'Server is running',
-    endpoints: {
-      api: '/api/v1',
-      health: '/api/v1/health',
-      documentation: 'Coming soon'
-    }
+    message: 'Chaaya Photography Portfolio API v1.0',
+    status: 'Production Ready'
   });
 });
 
-/**
- * 404 Handler - must be after all other routes
- */
+// 404 handler
 app.use(notFound);
 
-/**
- * Global Error Handler - must be last
- */
+// Error handler
 app.use(errorHandler);
 
 export default app;

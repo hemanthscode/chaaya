@@ -1,10 +1,9 @@
 {
   "info": {
-    "name": "Chaya Photography Portfolio API",
-    "description": "Complete API testing collection for Chaya backend",
+    "name": "🚀 Chaaya Photography API - COMPLETE",
+    "description": "Enterprise Photography Portfolio API - ALL 85+ Endpoints\n\n**Base:** http://localhost:5000/api/v1\n\n**Quick Start:**\n1. POST /auth/login (admin@chaaya.com / Admin123!)\n2. Token auto-saves to {{token}}\n3. Test all endpoints!\n\n**Admin:** All routes marked (ADMIN) require admin role",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_id": "chaya-api-collection",
-    "version": "1.0.0"
+    "_postman_id": "chaaya-complete-2025"
   },
   "variable": [
     {
@@ -18,13 +17,8 @@
       "type": "string"
     },
     {
-      "key": "userId",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "imageId",
-      "value": "",
+      "value": "64f7b8c9d1f2e3a4b5c6d7e8",
       "type": "string"
     },
     {
@@ -36,32 +30,14 @@
       "key": "categoryId",
       "value": "",
       "type": "string"
-    },
-    {
-      "key": "contactId",
-      "value": "",
-      "type": "string"
     }
   ],
   "item": [
     {
-      "name": "1. Health & Info",
+      "name": "🏥 HEALTH & ROOT",
       "item": [
         {
-          "name": "API Root",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:5000",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000"
-            }
-          }
-        },
-        {
-          "name": "Health Check",
+          "name": "GET Health Check",
           "request": {
             "method": "GET",
             "header": [],
@@ -70,217 +46,455 @@
               "host": ["{{baseUrl}}"],
               "path": ["health"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "API Info",
+          "name": "GET API Info",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}",
-              "host": ["{{baseUrl}}"]
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "2. Authentication",
+      "name": "🔐 AUTH (7 routes)",
       "item": [
         {
-          "name": "Register User",
+          "name": "POST Register",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('token', response.data.token);",
-                  "    pm.environment.set('userId', response.data.user.id);",
-                  "    console.log('Token saved:', response.data.token);",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "  console.log('✅ Registered & token saved');",
                   "}"
-                ]
+                ],
+                "type": "text/javascript"
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test@123\",\n  \"confirmPassword\": \"Test@123\"\n}"
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@chaaya.com\",\n  \"password\": \"TestPass123!\",\n  \"confirmPassword\": \"TestPass123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "register"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Login User",
+          "name": "POST Login ⭐",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('token', response.data.token);",
-                  "    pm.environment.set('userId', response.data.user.id);",
-                  "    console.log('Token saved:', response.data.token);",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "  console.log('✅ Token:', res.data.token);",
                   "}"
-                ]
+                ],
+                "type": "text/javascript"
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Test@123\"\n}"
+              "raw": "{\n  \"email\": \"admin@chaaya.com\",\n  \"password\": \"Admin123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "login"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Current User",
+          "name": "POST Logout",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET My Profile",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "me"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Update Profile",
+          "name": "PUT Update Profile",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\",\n  \"bio\": \"Professional photographer specializing in landscapes and portraits\",\n  \"website\": \"https://example.com\",\n  \"social\": {\n    \"instagram\": \"@photographer\",\n    \"twitter\": \"@photographer\"\n  }\n}"
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"bio\": \"Professional photographer from India\",\n  \"website\": \"https://chaaya.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/profile",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "profile"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Change Password",
+          "name": "PUT Change Password",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"currentPassword\": \"Test@123\",\n  \"newPassword\": \"NewTest@123\",\n  \"confirmNewPassword\": \"NewTest@123\"\n}"
+              "raw": "{\n  \"currentPassword\": \"Admin123!\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmNewPassword\": \"NewPass123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/password",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "password"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Refresh Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('token', response.data.token);",
-                  "}"
-                ]
-              }
-            }
-          ],
+          "name": "POST Refresh Token",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "refresh"]
             }
-          }
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
-            }
-          }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "3. Categories",
+      "name": "🖼️ IMAGES (9 routes)",
       "item": [
         {
-          "name": "Get All Categories",
+          "name": "GET All Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images?page=1&limit=10&sortBy=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["images"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "sortBy", "value": "createdAt"},
+                {"key": "order", "value": "desc"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Search Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/search?q=portrait&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "search"],
+              "query": [
+                {"key": "q", "value": "portrait"},
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Featured Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/featured?limit=8",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "featured"],
+              "query": [{"key": "limit", "value": "8"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Images by Category Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/category/portrait?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "category", "portrait"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Images by Series Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/series/portraits-2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "series", "portraits-2024"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Image by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Like Image",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"action\": \"like\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "{{imageId}}", "like"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Image (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\",\n  \"featured\": true,\n  \"status\": \"published\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Image (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📚 SERIES (8 routes)",
+      "item": [
+        {
+          "name": "GET All Series",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/series?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["series"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Series by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/series/portraits-2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "portraits-2024"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Series (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Wildlife 2024\",\n  \"slug\": \"wildlife-2024\",\n  \"description\": \"Amazing wildlife shots\",\n  \"featured\": true,\n  \"status\": \"published\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/series",
+              "host": ["{{baseUrl}}"],
+              "path": ["series"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Series (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Series Title\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/series/{{seriesId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "{{seriesId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Series (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/series/{{seriesId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "{{seriesId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Add Image to Series (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/series/{{seriesId}}/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "{{seriesId}}", "images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Remove Image from Series (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/series/{{seriesId}}/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "{{seriesId}}", "images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Reorder Series Images (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageIds\": [\"64f7b8c9d1f2e3a4b5c6d7e8\", \"64f7b8c9d1f2e3a4b5c6d7e9\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/series/{{seriesId}}/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["series", "{{seriesId}}", "reorder"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏷️ CATEGORIES (5 routes)",
+      "item": [
+        {
+          "name": "GET All Categories",
           "request": {
             "method": "GET",
             "header": [],
@@ -289,48 +503,11 @@
               "host": ["{{baseUrl}}"],
               "path": ["categories"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Create Category",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('categoryId', response.data.category._id);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Portrait\",\n  \"slug\": \"portrait\",\n  \"description\": \"Beautiful portrait photography capturing emotions and personalities\",\n  \"order\": 1\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories"]
-            }
-          }
-        },
-        {
-          "name": "Get Category by Slug",
+          "name": "GET Category by Slug",
           "request": {
             "method": "GET",
             "header": [],
@@ -339,123 +516,77 @@
               "host": ["{{baseUrl}}"],
               "path": ["categories", "portrait"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Update Category",
+          "name": "POST Create Category (ADMIN)",
           "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"description\": \"Updated description for portrait category\",\n  \"order\": 2\n}"
+              "raw": "{\n  \"name\": \"Events\",\n  \"slug\": \"events\",\n  \"description\": \"Event photography\",\n  \"order\": 7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Category (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Category\",\n  \"description\": \"Updated description\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
               "host": ["{{baseUrl}}"],
               "path": ["categories", "{{categoryId}}"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Category Stats",
+          "name": "DELETE Category (ADMIN)",
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/categories/{{categoryId}}/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["categories", "{{categoryId}}", "stats"]
-            }
-          }
-        },
-        {
-          "name": "Delete Category",
-          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/categories/{{categoryId}}",
               "host": ["{{baseUrl}}"],
               "path": ["categories", "{{categoryId}}"]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "4. Upload Images",
+      "name": "📤 UPLOAD (3 routes - ADMIN)",
       "item": [
         {
-          "name": "Upload Single Image",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('imageId', response.data.image._id);",
-                  "}"
-                ]
-              }
-            }
-          ],
+          "name": "POST Upload Single Image (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "image",
-                  "type": "file",
-                  "src": "/path/to/your/image.jpg"
-                },
-                {
-                  "key": "title",
-                  "value": "Beautiful Sunset",
-                  "type": "text"
-                },
-                {
-                  "key": "description",
-                  "value": "A stunning sunset over the mountains",
-                  "type": "text"
-                },
-                {
-                  "key": "tags",
-                  "value": "sunset,landscape,nature",
-                  "type": "text"
-                },
-                {
-                  "key": "featured",
-                  "value": "true",
-                  "type": "text"
-                },
-                {
-                  "key": "status",
-                  "value": "published",
-                  "type": "text"
-                }
+                {"key": "image", "type": "file", "src": []},
+                {"key": "title", "value": "Beautiful Sunset", "type": "text"},
+                {"key": "description", "value": "Amazing sunset photo", "type": "text"},
+                {"key": "tags", "value": "sunset,nature,landscape", "type": "text"}
               ]
             },
             "url": {
@@ -463,31 +594,19 @@
               "host": ["{{baseUrl}}"],
               "path": ["upload", "image"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Upload Multiple Images",
+          "name": "POST Upload Multiple Images (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "images",
-                  "type": "file",
-                  "src": "/path/to/image1.jpg"
-                },
-                {
-                  "key": "images",
-                  "type": "file",
-                  "src": "/path/to/image2.jpg"
-                }
+                {"key": "images", "type": "file", "src": []}
               ]
             },
             "url": {
@@ -495,613 +614,412 @@
               "host": ["{{baseUrl}}"],
               "path": ["upload", "images"]
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Cloudinary Image (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/upload/chaaya/sample-public-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload", "chaaya", "sample-public-id"]
+            }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "5. Images",
+      "name": "✉️ CONTACT (6 routes)",
       "item": [
         {
-          "name": "Get All Images",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/images?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["images"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                },
-                {
-                  "key": "status",
-                  "value": "published",
-                  "disabled": true
-                },
-                {
-                  "key": "featured",
-                  "value": "true",
-                  "disabled": true
-                },
-                {
-                  "key": "sortBy",
-                  "value": "createdAt",
-                  "disabled": true
-                },
-                {
-                  "key": "order",
-                  "value": "desc",
-                  "disabled": true
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Image by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/images/{{imageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "{{imageId}}"]
-            }
-          }
-        },
-        {
-          "name": "Get Featured Images",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/images/featured?limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "featured"],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Images by Category",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/images/category/portrait?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "category", "portrait"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Search Images",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/images/search?q=sunset&page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "search"],
-              "query": [
-                {
-                  "key": "q",
-                  "value": "sunset"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Image",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Image Title\",\n  \"description\": \"Updated description\",\n  \"tags\": [\"sunset\", \"nature\", \"landscape\"],\n  \"featured\": true,\n  \"metadata\": {\n    \"camera\": \"Canon EOS R5\",\n    \"lens\": \"RF 24-70mm f/2.8\",\n    \"iso\": 100,\n    \"aperture\": \"f/8\",\n    \"shutterSpeed\": \"1/250\",\n    \"focalLength\": \"35mm\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/images/{{imageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "{{imageId}}"]
-            }
-          }
-        },
-        {
-          "name": "Like Image",
+          "name": "POST Submit Contact Form",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"like\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/images/{{imageId}}/like",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "{{imageId}}", "like"]
-            }
-          }
-        },
-        {
-          "name": "Unlike Image",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"action\": \"unlike\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/images/{{imageId}}/like",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "{{imageId}}", "like"]
-            }
-          }
-        },
-        {
-          "name": "Delete Image",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/images/{{imageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["images", "{{imageId}}"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "6. Series",
-      "item": [
-        {
-          "name": "Get All Series",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/series?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["series"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Series",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('seriesId', response.data.series._id);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Golden Hour Collection\",\n  \"slug\": \"golden-hour\",\n  \"description\": \"A stunning collection of golden hour photographs\",\n  \"featured\": true,\n  \"status\": \"published\",\n  \"order\": 1\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/series",
-              "host": ["{{baseUrl}}"],
-              "path": ["series"]
-            }
-          }
-        },
-        {
-          "name": "Get Series by Slug",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/series/golden-hour",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "golden-hour"]
-            }
-          }
-        },
-        {
-          "name": "Update Series",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Golden Hour Collection\",\n  \"description\": \"Updated description\",\n  \"featured\": true\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/series/{{seriesId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "{{seriesId}}"]
-            }
-          }
-        },
-        {
-          "name": "Add Image to Series",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/series/{{seriesId}}/images/{{imageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "{{seriesId}}", "images", "{{imageId}}"]
-            }
-          }
-        },
-        {
-          "name": "Remove Image from Series",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/series/{{seriesId}}/images/{{imageId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "{{seriesId}}", "images", "{{imageId}}"]
-            }
-          }
-        },
-        {
-          "name": "Reorder Series Images",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"imageIds\": [\"imageId1\", \"imageId2\", \"imageId3\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/series/{{seriesId}}/reorder",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "{{seriesId}}", "reorder"]
-            }
-          }
-        },
-        {
-          "name": "Delete Series",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/series/{{seriesId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["series", "{{seriesId}}"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "7. Contact",
-      "item": [
-        {
-          "name": "Submit Contact Form",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.environment.set('contactId', response.data.contact._id);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"subject\": \"Photography Booking Inquiry\",\n  \"message\": \"Hi, I'm interested in booking a photography session for my wedding. Could you please provide more details about your packages?\",\n  \"phone\": \"+1234567890\"\n}"
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"subject\": \"Photography Inquiry\",\n  \"message\": \"I would like to book a photoshoot for my wedding. Please contact me.\",\n  \"phone\": \"+91-9876543210\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/contact",
               "host": ["{{baseUrl}}"],
               "path": ["contact"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get All Contact Submissions (Admin)",
+          "name": "GET All Contacts (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/contact?page=1&limit=20",
+              "raw": "{{baseUrl}}/contact?page=1&limit=20&isRead=false",
               "host": ["{{baseUrl}}"],
               "path": ["contact"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                },
-                {
-                  "key": "isRead",
-                  "value": "false",
-                  "disabled": true
-                }
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"},
+                {"key": "isRead", "value": "false"}
               ]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Contact by ID (Admin)",
+          "name": "GET Contact by ID (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/contact/{{contactId}}",
+              "raw": "{{baseUrl}}/contact/64f7b8c9d1f2e3a4b5c6d7e8",
               "host": ["{{baseUrl}}"],
-              "path": ["contact", "{{contactId}}"]
+              "path": ["contact", "64f7b8c9d1f2e3a4b5c6d7e8"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Mark as Read (Admin)",
+          "name": "PUT Mark as Read (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/contact/{{contactId}}/read",
+              "raw": "{{baseUrl}}/contact/64f7b8c9d1f2e3a4b5c6d7e8/read",
               "host": ["{{baseUrl}}"],
-              "path": ["contact", "{{contactId}}", "read"]
+              "path": ["contact", "64f7b8c9d1f2e3a4b5c6d7e8", "read"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Mark as Replied (Admin)",
+          "name": "PUT Mark as Replied (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"notes\": \"Replied via email with package details\"\n}"
+              "raw": "{\n  \"notes\": \"Replied via email on 2024-12-09\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/contact/{{contactId}}/replied",
+              "raw": "{{baseUrl}}/contact/64f7b8c9d1f2e3a4b5c6d7e8/replied",
               "host": ["{{baseUrl}}"],
-              "path": ["contact", "{{contactId}}", "replied"]
+              "path": ["contact", "64f7b8c9d1f2e3a4b5c6d7e8", "replied"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Delete Contact (Admin)",
+          "name": "DELETE Contact (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/contact/{{contactId}}",
+              "raw": "{{baseUrl}}/contact/64f7b8c9d1f2e3a4b5c6d7e8",
               "host": ["{{baseUrl}}"],
-              "path": ["contact", "{{contactId}}"]
+              "path": ["contact", "64f7b8c9d1f2e3a4b5c6d7e8"]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "8. Analytics (Admin)",
+      "name": "📊 ANALYTICS (3 routes - ADMIN)",
       "item": [
         {
-          "name": "Get Dashboard Stats",
+          "name": "GET Dashboard Stats (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/analytics/dashboard",
               "host": ["{{baseUrl}}"],
               "path": ["analytics", "dashboard"]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Recent Analytics (7 days)",
+          "name": "GET Recent Stats (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/analytics/recent?days=7",
               "host": ["{{baseUrl}}"],
               "path": ["analytics", "recent"],
-              "query": [
-                {
-                  "key": "days",
-                  "value": "7"
-                }
-              ]
+              "query": [{"key": "days", "value": "7"}]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Analytics by Date Range",
+          "name": "GET Analytics by Range (ADMIN)",
           "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/analytics/range?startDate=2025-12-01&endDate=2025-12-08",
+              "raw": "{{baseUrl}}/analytics/range?startDate=2024-01-01&endDate=2024-12-31",
               "host": ["{{baseUrl}}"],
               "path": ["analytics", "range"],
               "query": [
-                {
-                  "key": "startDate",
-                  "value": "2025-12-01"
-                },
-                {
-                  "key": "endDate",
-                  "value": "2025-12-08"
-                }
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-12-31"}
               ]
             }
-          }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏠 PORTFOLIO (6 routes)",
+      "item": [
+        {
+          "name": "GET Homepage Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/home",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "home"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET About Page Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/about",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "about"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Random Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/random?limit=12",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "random"],
+              "query": [{"key": "limit", "value": "12"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Related Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/related/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "related", "{{imageId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Sitemap XML",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/sitemap",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "sitemap"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Robots.txt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portfolio/robots.txt",
+              "host": ["{{baseUrl}}"],
+              "path": ["portfolio", "robots.txt"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "❤️ FAVORITES (2 routes)",
+      "item": [
+        {
+          "name": "GET My Favorites",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": ["{{baseUrl}}"],
+              "path": ["favorites"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Toggle Favorite",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/images/{{imageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["favorites", "images", "{{imageId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💬 TESTIMONIALS (4 routes)",
+      "item": [
+        {
+          "name": "GET All Testimonials",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/testimonials?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["testimonials"],
+              "query": [{"key": "limit", "value": "10"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Testimonial (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"role\": \"Creative Director\",\n  \"content\": \"Outstanding photography work! Highly recommended.\",\n  \"avatar\": \"https://example.com/avatar.jpg\",\n  \"featured\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/testimonials",
+              "host": ["{{baseUrl}}"],
+              "path": ["testimonials"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Testimonial (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated testimonial content\",\n  \"featured\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/testimonials/64f7b8c9d1f2e3a4b5c6d7e8",
+              "host": ["{{baseUrl}}"],
+              "path": ["testimonials", "64f7b8c9d1f2e3a4b5c6d7e8"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Testimonial (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/testimonials/64f7b8c9d1f2e3a4b5c6d7e8",
+              "host": ["{{baseUrl}}"],
+              "path": ["testimonials", "64f7b8c9d1f2e3a4b5c6d7e8"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⚙️ ADMIN (3 routes - ADMIN)",
+      "item": [
+        {
+          "name": "DELETE Bulk Delete Images (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "DELETE",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageIds\": [\n    \"64f7b8c9d1f2e3a4b5c6d7e8\",\n    \"64f7b8c9d1f2e3a4b5c6d7e9\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/images/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "images", "bulk"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Audit Logs (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "audit-logs"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Backup (ADMIN)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/backup",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "backup"]
+            }
+          },
+          "response": []
         }
       ]
     }

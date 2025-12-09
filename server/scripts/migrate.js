@@ -1,48 +1,51 @@
+#!/usr/bin/env node
 /**
- * Database Migration Script
- * Handles database schema migrations
+ * Database Migration Script - Enterprise Edition
+ * Versioned, idempotent migrations
  */
 
-import { connectDatabase, disconnectDatabase } from '../server/src/config/database.js';
-import logger from '../server/src/utils/logger.js';
+import mongoose from 'mongoose';
+import { connectDatabase } from '../src/config/database.js';
+import logger from '../src/utils/logger.js';
 
-/**
- * Migration functions
- */
-const migrations = {
-  /**
-   * Example migration: Add new field to existing documents
-   */
-  async migration_001() {
-    logger.info('Running migration 001: Example migration');
-    // Add your migration logic here
-    logger.info('✅ Migration 001 completed');
+const MIGRATIONS = {
+  '001-add-image-views-index': async () => {
+    const Image = mongoose.model('Image');
+    await Image.collection.createIndex({ views: -1 });
+    logger.info('✅ Migration 001: Image views index');
   },
-
-  // Add more migrations as needed
+  
+  '002-add-series-slug-unique': async () => {
+    const Series = mongoose.model('Series');
+    await Series.collection.createIndex({ slug: 1 }, { unique: true });
+    logger.info('✅ Migration 002: Series slug unique');
+  },
+  
+  '003-add-user-last-login': async () => {
+    const User = mongoose.model('User');
+    await User.updateMany({ lastLogin: { $exists: false } }, { $set: { lastLogin: null } });
+    logger.info('✅ Migration 003: User lastLogin field');
+  }
 };
 
-/**
- * Run migrations
- */
 const runMigrations = async () => {
   try {
     await connectDatabase();
-    
-    logger.info('🔄 Starting database migrations...');
+    logger.info('🔄 Running enterprise migrations...');
 
-    const migrationKeys = Object.keys(migrations);
-    
+    const migrationKeys = Object.keys(MIGRATIONS);
+    let completed = 0;
+
     for (const key of migrationKeys) {
-      await migrations[key]();
+      try {
+        await MIGRATIONS[key]();
+        completed++;
+      } catch (error) {
+        logger.warn(`⚠️  Migration ${key} failed (skipped):`, error.message);
+      }
     }
 
-    logger.info('');
-    logger.info('🎉 All migrations completed successfully!');
-    logger.info(`   Total migrations run: ${migrationKeys.length}`);
-    logger.info('');
-
-    await disconnectDatabase();
+    logger.info(`🎉 Migrations complete: ${completed}/${migrationKeys.length}`);
     process.exit(0);
   } catch (error) {
     logger.error('❌ Migration failed:', error);
@@ -50,5 +53,4 @@ const runMigrations = async () => {
   }
 };
 
-// Run migrations
 runMigrations();

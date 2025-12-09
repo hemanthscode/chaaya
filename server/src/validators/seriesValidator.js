@@ -1,267 +1,147 @@
-/**
- * Series Validators
- * Validates series-related request data
- */
-
-import { 
-  isValidObjectId, 
-  isValidSlug,
-  sanitizeString,
-  generateSlug 
-} from '../utils/validators.js';
+import { isValidObjectId, isValidSlug, sanitizeString, generateSlug } from '../utils/validators.js';
 import { ENUMS } from '../constants/enums.js';
 
-/**
- * Validate series creation data
- */
 export const validateSeriesCreate = (body) => {
   const errors = [];
   const data = {};
 
-  // Title validation (required)
-  if (!body.title || body.title.trim().length === 0) {
-    errors.push('Series title is required');
-  } else if (body.title.trim().length < 2) {
-    errors.push('Title must be at least 2 characters');
-  } else if (body.title.trim().length > 100) {
-    errors.push('Title cannot exceed 100 characters');
+  if (!body.title?.trim() || body.title.trim().length < 2 || body.title.trim().length > 100) {
+    errors.push('Title must be 2-100 characters');
   } else {
     data.title = sanitizeString(body.title);
   }
 
-  // Slug validation (auto-generate if not provided)
-  if (body.slug) {
-    if (!isValidSlug(body.slug)) {
-      errors.push('Slug must contain only lowercase letters, numbers, and hyphens');
-    } else {
-      data.slug = body.slug;
-    }
+  if (body.slug && !isValidSlug(body.slug)) {
+    errors.push('Invalid slug format');
+  } else if (body.slug) {
+    data.slug = body.slug;
   } else if (data.title) {
     data.slug = generateSlug(data.title);
   }
 
-  // Description (optional)
-  if (body.description !== undefined) {
-    if (body.description.length > 1000) {
-      errors.push('Description cannot exceed 1000 characters');
-    } else {
-      data.description = sanitizeString(body.description);
-    }
+  if (body.description !== undefined && body.description.length > 1000) {
+    errors.push('Description max 1000 characters');
+  } else if (body.description !== undefined) {
+    data.description = sanitizeString(body.description);
   }
 
-  // Category (optional)
-  if (body.category !== undefined && body.category !== null) {
-    if (!isValidObjectId(body.category)) {
-      errors.push('Invalid category ID');
-    } else {
-      data.category = body.category;
-    }
-  }
+  if (body.category && !isValidObjectId(body.category)) errors.push('Invalid category');
+  if (body.coverImage && !isValidObjectId(body.coverImage)) errors.push('Invalid cover image');
 
-  // Cover image (optional)
-  if (body.coverImage !== undefined && body.coverImage !== null) {
-    if (!isValidObjectId(body.coverImage)) {
-      errors.push('Invalid cover image ID');
-    } else {
-      data.coverImage = body.coverImage;
-    }
-  }
-
-  // Images array (optional)
   if (body.images !== undefined) {
-    if (Array.isArray(body.images)) {
-      const invalidIds = body.images.filter(id => !isValidObjectId(id));
-      if (invalidIds.length > 0) {
-        errors.push('One or more invalid image IDs');
-      } else {
-        data.images = body.images;
-      }
+    if (!Array.isArray(body.images)) {
+      errors.push('Images must be array');
     } else {
-      errors.push('Images must be an array');
+      const invalid = body.images.filter(id => !isValidObjectId(id));
+      if (invalid.length) errors.push('Invalid image IDs');
+      else data.images = body.images;
     }
   }
 
-  // Order (optional)
-  if (body.order !== undefined) {
-    const order = parseInt(body.order, 10);
-    if (!isNaN(order)) {
-      data.order = order;
-    }
-  }
-
-  // Featured (optional)
-  if (body.featured !== undefined) {
-    data.featured = body.featured === 'true' || body.featured === true;
-  }
-
-  // Status (optional)
-  if (body.status !== undefined) {
-    if (Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
-      data.status = body.status;
-    } else {
-      errors.push('Invalid status value');
-    }
+  if (body.featured !== undefined) data.featured = !!body.featured;
+  if (body.order !== undefined) data.order = parseInt(body.order, 10) || 0;
+  if (body.status && !Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
+    errors.push('Invalid status');
+  } else if (body.status) {
+    data.status = body.status;
   }
 
   return { errors, data };
 };
 
-/**
- * Validate series update data
- */
 export const validateSeriesUpdate = (body, params) => {
   const errors = [];
   const data = {};
 
-  // Validate series ID from params
-  if (!params.id || !isValidObjectId(params.id)) {
+  if (!isValidObjectId(params.id)) {
     errors.push('Invalid series ID');
   }
 
-  // Title (optional)
   if (body.title !== undefined) {
-    if (body.title.trim().length < 2) {
-      errors.push('Title must be at least 2 characters');
-    } else if (body.title.trim().length > 100) {
-      errors.push('Title cannot exceed 100 characters');
+    if (body.title?.trim().length < 2 || body.title?.trim().length > 100) {
+      errors.push('Title must be 2-100 characters');
     } else {
       data.title = sanitizeString(body.title);
     }
   }
 
-  // Slug (optional)
-  if (body.slug !== undefined) {
-    if (!isValidSlug(body.slug)) {
-      errors.push('Slug must contain only lowercase letters, numbers, and hyphens');
-    } else {
-      data.slug = body.slug;
-    }
+  if (body.slug !== undefined && !isValidSlug(body.slug)) {
+    errors.push('Invalid slug format');
+  } else if (body.slug !== undefined) {
+    data.slug = body.slug;
   }
 
-  // Description (optional)
-  if (body.description !== undefined) {
-    if (body.description.length > 1000) {
-      errors.push('Description cannot exceed 1000 characters');
-    } else {
-      data.description = sanitizeString(body.description);
-    }
+  if (body.description !== undefined && body.description.length > 1000) {
+    errors.push('Description max 1000 characters');
+  } else if (body.description !== undefined) {
+    data.description = sanitizeString(body.description);
   }
 
-  // Category (optional)
   if (body.category !== undefined) {
     if (body.category === null) {
       data.category = null;
     } else if (!isValidObjectId(body.category)) {
-      errors.push('Invalid category ID');
+      errors.push('Invalid category');
     } else {
       data.category = body.category;
     }
   }
 
-  // Cover image (optional)
   if (body.coverImage !== undefined) {
     if (body.coverImage === null) {
       data.coverImage = null;
     } else if (!isValidObjectId(body.coverImage)) {
-      errors.push('Invalid cover image ID');
+      errors.push('Invalid cover image');
     } else {
       data.coverImage = body.coverImage;
     }
   }
 
-  // Order (optional)
-  if (body.order !== undefined) {
-    const order = parseInt(body.order, 10);
-    if (!isNaN(order)) {
-      data.order = order;
-    }
-  }
-
-  // Featured (optional)
-  if (body.featured !== undefined) {
-    data.featured = body.featured === 'true' || body.featured === true;
-  }
-
-  // Status (optional)
-  if (body.status !== undefined) {
-    if (Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
-      data.status = body.status;
-    } else {
-      errors.push('Invalid status value');
-    }
+  if (body.featured !== undefined) data.featured = !!body.featured;
+  if (body.order !== undefined) data.order = parseInt(body.order, 10) || 0;
+  if (body.status && !Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
+    errors.push('Invalid status');
+  } else if (body.status) {
+    data.status = body.status;
   }
 
   return { errors, data };
 };
 
-/**
- * Validate series reorder data
- */
-export const validateSeriesReorder = (body, params) => {
+export const validateSeriesReorder = (body) => {
   const errors = [];
   const data = {};
 
-  // Validate series ID from params
-  if (!params.id || !isValidObjectId(params.id)) {
-    errors.push('Invalid series ID');
-  }
-
-  // Validate ordered image IDs
-  if (!body.imageIds || !Array.isArray(body.imageIds)) {
-    errors.push('imageIds must be an array');
+  if (!Array.isArray(body.imageIds)) {
+    errors.push('imageIds must be array');
   } else {
-    const invalidIds = body.imageIds.filter(id => !isValidObjectId(id));
-    if (invalidIds.length > 0) {
-      errors.push('One or more invalid image IDs');
-    } else {
-      data.imageIds = body.imageIds;
-    }
+    const invalid = body.imageIds.filter(id => !isValidObjectId(id));
+    if (invalid.length) errors.push('Invalid image IDs');
+    else data.imageIds = body.imageIds;
   }
 
   return { errors, data };
 };
 
-/**
- * Validate series query filters
- */
 export const validateSeriesQuery = (query) => {
   const errors = [];
   const filters = {};
 
-  // Category filter
-  if (query.category) {
-    if (isValidObjectId(query.category)) {
-      filters.category = query.category;
-    } else {
-      errors.push('Invalid category ID');
-    }
-  }
+  if (query.category && !isValidObjectId(query.category)) errors.push('Invalid category');
+  else if (query.category) filters.category = query.category;
 
-  // Status filter
-  if (query.status) {
-    if (Object.values(ENUMS.SERIES_STATUS).includes(query.status)) {
-      filters.status = query.status;
-    } else {
-      errors.push('Invalid status value');
-    }
-  }
-
-  // Featured filter
-  if (query.featured !== undefined) {
-    filters.featured = query.featured === 'true';
-  }
-
-  // Search query
-  if (query.search) {
-    filters.$text = { $search: query.search };
+  if (query.status && !Object.values(ENUMS.SERIES_STATUS).includes(query.status)) {
+    errors.push('Invalid status');
+  } else if (query.status) {
+    filters.status = query.status;
   }
 
   return { errors, filters };
 };
 
-export default {
-  validateSeriesCreate,
-  validateSeriesUpdate,
-  validateSeriesReorder,
-  validateSeriesQuery
+export default { 
+  validateSeriesCreate, 
+  validateSeriesUpdate, 
+  validateSeriesReorder, 
+  validateSeriesQuery 
 };

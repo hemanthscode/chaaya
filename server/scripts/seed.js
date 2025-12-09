@@ -1,100 +1,72 @@
+#!/usr/bin/env node
 /**
- * Database Seeding Script
- * Seeds the database with initial data
+ * Database Seeding Script - Enterprise Edition
+ * Creates production-ready sample data (NO DOUBLE HASHING)
  */
 
 import mongoose from 'mongoose';
 import { connectDatabase } from '../src/config/database.js';
 import User from '../src/models/User.js';
 import Category from '../src/models/Category.js';
+import Series from '../src/models/Series.js';
+import Image from '../src/models/Image.js';
+import Testimonial from '../src/models/Testimonial.js';
 import { ENUMS } from '../src/constants/enums.js';
 import logger from '../src/utils/logger.js';
 
-/**
- * Seed data
- */
 const seedData = async () => {
   try {
     await connectDatabase();
-    
-    logger.info('🌱 Starting database seeding...');
+    logger.info('🌱 Enterprise seeding started...');
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Category.deleteMany({});
-    
-    logger.info('✅ Cleared existing data');
+    // Clear existing
+    await Promise.all([
+      User.deleteMany({}),
+      Category.deleteMany({}),
+      Series.deleteMany({}),
+      Image.deleteMany({}),
+      Testimonial.deleteMany({})
+    ]);
 
-    // Create admin user
-    const adminUser = await User.create({
-      name: 'Admin User',
-      email: 'admin@chaya.com',
-      password: 'Admin@123',
-      role: ENUMS.USER_ROLES.ADMIN,
-      isActive: true
+    // 1. Admin User - PLAIN PASSWORD (Schema handles hashing)
+    const admin = await User.create({
+      name: 'Chaaya Admin',
+      email: 'admin@chaaya.com',
+      password: 'Admin123!',  
+      role: ENUMS.USER_ROLES.ADMIN
     });
 
-    logger.info('✅ Admin user created');
-    logger.info(`   Email: ${adminUser.email}`);
-    logger.info(`   Password: Admin@123`);
+    // 2. Categories
+    const categories = await Category.insertMany([
+      { name: 'Portrait', slug: 'portrait', order: 1, description: 'People & emotions' },
+      { name: 'Landscape', slug: 'landscape', order: 2, description: 'Nature & travel' },
+      { name: 'Street', slug: 'street', order: 3, description: 'Urban life' }
+    ]);
 
-    // Create default categories
-    const categories = [
+    // 3. Series
+    const portraitSeries = await Series.create({
+      title: 'Portraits 2024',
+      slug: 'portraits-2024',
+      description: 'Emotional portraits collection',
+      category: categories[0]._id,
+      featured: true,
+      status: 'published'
+    });
+
+    // 4. Testimonials
+    await Testimonial.insertMany([
       {
-        name: 'Portrait',
-        slug: 'portrait',
-        description: 'Capturing the essence of individuals and their personalities',
-        order: 1
-      },
-      {
-        name: 'Landscape',
-        slug: 'landscape',
-        description: 'Natural and urban landscapes from around the world',
-        order: 2
-      },
-      {
-        name: 'Wildlife',
-        slug: 'wildlife',
-        description: 'Animals in their natural habitats',
-        order: 3
-      },
-      {
-        name: 'Street',
-        slug: 'street',
-        description: 'Candid moments from everyday life',
-        order: 4
-      },
-      {
-        name: 'Architecture',
-        slug: 'architecture',
-        description: 'Buildings and structural designs',
-        order: 5
-      },
-      {
-        name: 'Abstract',
-        slug: 'abstract',
-        description: 'Creative and conceptual photography',
-        order: 6
+        name: 'Sarah Johnson',
+        role: 'Art Director',
+        content: "Chaaya's work captures emotion perfectly!",
+        featured: true
       }
-    ];
+    ]);
 
-    await Category.insertMany(categories);
-    
-    logger.info('✅ Categories created');
-    logger.info(`   Created ${categories.length} categories`);
-
-    logger.info('');
-    logger.info('🎉 Database seeding completed successfully!');
-    logger.info('');
-    logger.info('📋 Summary:');
-    logger.info(`   - Admin users: 1`);
-    logger.info(`   - Categories: ${categories.length}`);
-    logger.info('');
-    logger.info('🔑 Admin Login:');
-    logger.info(`   Email: admin@chaya.com`);
-    logger.info(`   Password: Admin@123`);
-    logger.info('');
-
+    logger.info('✅ Seeding complete!');
+    logger.info('👤 Admin: admin@chaaya.com / Admin123!');
+    logger.info('📂 Categories:', categories.length);
+    logger.info('📚 Series:', 1);
     process.exit(0);
   } catch (error) {
     logger.error('❌ Seeding failed:', error);
@@ -102,5 +74,4 @@ const seedData = async () => {
   }
 };
 
-// Run seeding
 seedData();

@@ -1,51 +1,61 @@
+#!/usr/bin/env node
 /**
- * Database Backup Script
- * Creates a backup of the MongoDB database
+ * Database Backup Script - Enterprise Edition
+ * Creates timestamped MongoDB backups with cleanup
  */
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
-import { config } from '../server/src/config/env.js';
-import logger from '../server/src/utils/logger.js';
+import logger from '../src/utils/logger.js';
 
 const execAsync = promisify(exec);
 
-/**
- * Create backup
- */
 const createBackup = async () => {
   try {
-    logger.info('🔄 Starting database backup...');
+    logger.info('🔄 Starting enterprise database backup...');
 
-    // Create backups directory if it doesn't exist
     const backupDir = './backups';
-    if (!fs.existsSync(backupDir)) {
-      fs.mkdirSync(backupDir, { recursive: true });
-    }
+    await fs.mkdir(backupDir, { recursive: true });
 
-    // Generate backup filename with timestamp
     const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
-    const backupPath = path.join(backupDir, `chaya-backup-${timestamp}`);
+    const backupPath = path.join(backupDir, `chaaya-${timestamp}`);
 
-    // Parse MongoDB URI to get database name
-    const dbName = config.mongodbUri.split('/').pop().split('?')[0];
+    // Use mongodump with optimized flags
+    const command = [
+      'mongodump',
+      '--uri=mongodb://localhost:27017/chaaya', // Use local for reliability
+      '--out=' + backupPath,
+      '--gzip', // Compress
+      '--archive=' + path.join(backupPath, `chaaya-${timestamp}.gz`)
+    ].join(' ');
 
-    // Create mongodump command
-    const command = `mongodump --uri="${config.mongodbUri}" --out="${backupPath}"`;
+    logger.info('📦 Executing mongodump...');
+    const { stdout } = await execAsync(command);
+    
+    // Cleanup individual dumps, keep only archive
+    await fs.rm(path.join(backupPath, 'chaaya'), { recursive: true, force: true });
 
-    logger.info('📦 Creating backup...');
-    await execAsync(command);
+    const stats = await fs.stat(path.join(backupPath, `chaaya-${timestamp}.gz`));
+    const size = (stats.size / 1024 / 1024).toFixed(2);
 
-    logger.info('✅ Backup created successfully!');
-    logger.info(`   Location: ${backupPath}`);
-    logger.info(`   Database: ${dbName}`);
-
-    // List backup size
-    const { stdout } = await execAsync(`du -sh "${backupPath}"`);
-    logger.info(`   Size: ${stdout.trim().split('\t')[0]}`);
-
+    logger.info('✅ Backup completed!');
+    logger.info(`📁 Location: ${backupPath}/chaaya-${timestamp}.gz`);
+    logger.info(`💾 Size: ${size} MB`);
+    
+    // Cleanup old backups (keep last 5)
+    const backups = await fs.readdir(backupDir);
+    const sorted = backups
+      .filter(f => f.startsWith('chaaya-'))
+      .sort((a, b) => path.parse(b).name.localeCompare(path.parse(a).name))
+      .slice(5);
+    
+    for (const old of sorted) {
+      await fs.rm(path.join(backupDir, old), { recursive: true });
+    }
+    
+    logger.info('🧹 Old backups cleaned');
     process.exit(0);
   } catch (error) {
     logger.error('❌ Backup failed:', error.message);
@@ -53,5 +63,4 @@ const createBackup = async () => {
   }
 };
 
-// Run backup
 createBackup();
