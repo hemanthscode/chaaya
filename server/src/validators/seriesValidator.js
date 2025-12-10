@@ -78,7 +78,7 @@ export const validateSeriesUpdate = (body, params) => {
   }
 
   if (body.category !== undefined) {
-    if (body.category === null) {
+    if (body.category === null || body.category === '') {
       data.category = null;
     } else if (!isValidObjectId(body.category)) {
       errors.push('Invalid category');
@@ -88,7 +88,7 @@ export const validateSeriesUpdate = (body, params) => {
   }
 
   if (body.coverImage !== undefined) {
-    if (body.coverImage === null) {
+    if (body.coverImage === null || body.coverImage === '') {
       data.coverImage = null;
     } else if (!isValidObjectId(body.coverImage)) {
       errors.push('Invalid cover image');
@@ -97,12 +97,25 @@ export const validateSeriesUpdate = (body, params) => {
     }
   }
 
+  if (body.images !== undefined) {
+    if (!Array.isArray(body.images)) {
+      errors.push('Images must be array');
+    } else {
+      const invalid = body.images.filter(id => !isValidObjectId(id));
+      if (invalid.length) errors.push('Invalid image IDs');
+      else data.images = body.images;
+    }
+  }
+
   if (body.featured !== undefined) data.featured = !!body.featured;
   if (body.order !== undefined) data.order = parseInt(body.order, 10) || 0;
-  if (body.status && !Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
-    errors.push('Invalid status');
-  } else if (body.status) {
-    data.status = body.status;
+  
+  if (body.status !== undefined) {
+    if (!Object.values(ENUMS.SERIES_STATUS).includes(body.status)) {
+      errors.push('Invalid status');
+    } else {
+      data.status = body.status;
+    }
   }
 
   return { errors, data };

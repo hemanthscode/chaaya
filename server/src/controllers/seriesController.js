@@ -16,19 +16,33 @@ export const getAllSeries = asyncHandler(async (req, res) => {
   if (!req.user?.isAdmin()) query.status = 'published';
 
   const [seriesList, total] = await Promise.all([
-    Series.find(query).populate('coverImage category').populate({ path: 'images', select: 'thumbnailUrl title', options: { limit: 5 } })
-      .sort({ featured: -1, order: 1 }).skip(pagination.skip()).limit(pagination.limit).lean(),
+    Series.find(query)
+      .populate('coverImage category')
+      .populate({ path: 'images', select: 'thumbnailUrl title', options: { limit: 5 } })
+      .sort({ featured: -1, order: 1 })
+      .skip(pagination.skip())
+      .limit(pagination.limit)
+      .lean(),
     Series.countDocuments(query)
   ]);
 
-  sendPaginated(res, { series: seriesList }, { page: pagination.page, limit: pagination.limit, total }, MESSAGES.SERIES.FETCH_SUCCESS);
+  sendPaginated(
+    res,
+    { series: seriesList },
+    { page: pagination.page, limit: pagination.limit, total },
+    MESSAGES.SERIES.FETCH_SUCCESS
+  );
 });
 
 export const getSeriesBySlug = asyncHandler(async (req, res) => {
   const series = await Series.findOne({ slug: req.params.slug })
-    .populate('coverImage category').populate({ path: 'images', match: { status: 'published' } });
+    .populate('coverImage category')
+    .populate({ path: 'images', match: { status: 'published' } });
+    
   if (!series) throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.SERIES.NOT_FOUND);
-  if (series.status === 'draft' && !req.user?.isAdmin()) throw new ApiError(STATUS_CODES.FORBIDDEN, 'Access denied');
+  if (series.status === 'draft' && !req.user?.isAdmin()) {
+    throw new ApiError(STATUS_CODES.FORBIDDEN, 'Access denied');
+  }
 
   series.incrementViews().catch(err => logger.error('View increment failed:', err));
   sendSuccess(res, { series }, MESSAGES.SERIES.FETCH_SUCCESS);
@@ -47,6 +61,7 @@ export const createSeries = asyncHandler(async (req, res) => {
   }
 
   const series = await Series.create(data);
+  
   if (data.images?.length) {
     await Image.updateMany({ _id: { $in: data.images } }, { $set: { series: series._id } });
   }
@@ -58,14 +73,40 @@ export const createSeries = asyncHandler(async (req, res) => {
 
 export const updateSeries = asyncHandler(async (req, res) => {
   const updates = req.validatedData;
+
   if (updates.slug) {
     const existing = await Series.findOne({ slug: updates.slug, _id: { $ne: req.params.id } });
     if (existing) throw new ApiError(STATUS_CODES.CONFLICT, 'Slug already exists');
   }
 
-  const series = await Series.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
-    .populate('coverImage category images');
+  const series = await Series.findById(req.params.id);
   if (!series) throw new ApiError(STATUS_CODES.NOT_FOUND, MESSAGES.SERIES.NOT_FOUND);
+
+  if (updates.images !== undefined) {
+    const oldImageIds = series.images.map(id => id.toString());
+    const newImageIds = updates.images.map(id => id.toString());
+
+    const toUnlink = oldImageIds.filter(id => !newImageIds.includes(id));
+    const toLink = newImageIds.filter(id => !oldImageIds.includes(id));
+
+    if (toUnlink.length > 0) {
+      await Image.updateMany(
+        { _id: { $in: toUnlink } },
+        { $set: { series: null } }
+      );
+    }
+
+    if (toLink.length > 0) {
+      await Image.updateMany(
+        { _id: { $in: toLink } },
+        { $set: { series: series._id } }
+      );
+    }
+  }
+
+  Object.assign(series, updates);
+  await series.save();
+  await series.populate('coverImage category images');
 
   clearCacheByPattern('series');
   sendSuccess(res, { series }, MESSAGES.SERIES.UPDATE_SUCCESS);
@@ -118,6 +159,12 @@ export const reorderSeriesImages = asyncHandler(async (req, res) => {
 });
 
 export default {
-  getAllSeries, getSeriesBySlug, createSeries, updateSeries,
-  deleteSeries, addImageToSeries, removeImageFromSeries, reorderSeriesImages
+  getAllSeries,
+  getSeriesBySlug,
+  createSeries,
+  updateSeries,
+  deleteSeries,
+  addImageToSeries,
+  removeImageFromSeries,
+  reorderSeriesImages
 };
